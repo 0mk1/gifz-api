@@ -1,0 +1,28 @@
+version: '3.3'
+services:
+  postgres:
+    image: postgres:9.6-alpine
+    environment:
+      - PGDATA=/var/lib/postgresql/data
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+  redis:
+    image: redis:4-alpine
+  django:
+    build: .
+    image: gifz_api
+    command: runserver
+    volumes:
+      - .:/project/code
+      - media:/project/media
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+      - redis
+    env_file: .env
+volumes:
+  pg-data:
+    driver: local
+  media:
+    driver: local
