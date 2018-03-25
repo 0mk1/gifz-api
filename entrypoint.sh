@@ -19,6 +19,8 @@ elif [ "$1" = 'lint' ]; then
 elif [ "$1" = 'test' ]; then
     shift
     exec pytest $@
+elif [ "$1" = 'celery' ]; then
+    exec celery -A config worker
 elif [ "$1" = 'isort' ]; then
     shift
     exec isort -vb -ac -y -r $@

@@ -3,6 +3,5 @@
 .cache
 tags
 .coverage
-.env
 Makefile
 manage-compose

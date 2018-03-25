@@ -1,5 +1,6 @@
 Django==1.11.9
 Werkzeug==0.14.1
+celery==4.1.0
 coreapi==2.3.3
 django-cachalot==1.5.0
 django-cleanup==2.1.0
@@ -14,6 +15,7 @@ django-redis==4.8.0
 django-stdimage==3.0.0
 django-taggit-serializer==0.1.5
 django-taggit==0.22.2
+django-templated-mail==1.1.1
 djangorestframework==3.7.7
 djoser==1.1.5
 flake8-commas==1.0.0

@@ -19,6 +19,8 @@ DATABASES = {
     },
 }
 
-MEDIA_ROOT = (root - 3)('test_media')
+MEDIA_ROOT = (root - 1)('test_media')
 
 EMAIL_BACKEND = 'django.core.mail.backends.locmem.EmailBackend'
+
+CELERY_TASK_ALWAYS_EAGER = True

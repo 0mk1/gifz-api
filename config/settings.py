@@ -1,9 +1,10 @@
+import logging
+
 import environ
-import raven
 
 
 # --- BASE ---
-root = environ.Path(__file__)
+root = environ.Path(__file__) - 2
 env = environ.Env()
 
 BASE_DIR = root()
@@ -65,11 +66,11 @@ AUTH_USER_MODEL = 'accounts.User'
 # SOCIAL_AUTH_USER_MODEL = 'accounts.User'
 
 # AUTHENTICATION_BACKENDS = (
-#     'gifz_api.lib.djoser.social.backends.google_openidconnect.GoogleOpenIdConnect',  # noqa: E501
+#     'gifz_api.ext.djoser.social.backends.google_openidconnect.GoogleOpenIdConnect',  # noqa: E501
 #     'django.contrib.auth.backends.ModelBackend',
 # )
 # SOCIAL_AUTH_AUTHENTICATION_BACKENDS = (
-#     'gifz_api.lib.djoser.social.backends.google_openidconnect.GoogleOpenIdConnect',  # noqa: E501
+#     'gifz_api.ext.djoser.social.backends.google_openidconnect.GoogleOpenIdConnect',  # noqa: E501
 # )
 # SOCIAL_AUTH_GOOGLE_OPENIDCONNECT_KEY = env(
 #     'GOOGLE_OAUTH2_KEY',
@@ -104,7 +105,9 @@ AUTH_PASSWORD_VALIDATORS = [
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [
+            root('gifz_api/templates'),
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -126,9 +129,9 @@ USE_TZ = True
 
 # --- FILES ---
 STATIC_URL = env('STATIC_URL', default='/static/')
-STATIC_ROOT = env('STATIC_ROOT', default=(root - 3)('static'))
+STATIC_ROOT = env('STATIC_ROOT', default=(root - 1)('static'))
 MEDIA_URL = env('MEDIA_URL', default='/media/')
-MEDIA_ROOT = env('MEDIA_ROOT', default=(root - 3)('media'))
+MEDIA_ROOT = env('MEDIA_ROOT', default=(root - 1)('media'))
 
 # --- REST FRAMEWORK ---
 REST_FRAMEWORK = {
@@ -138,6 +141,9 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.TokenAuthentication',
     ),
+    'DEFAULT_RENDERER_CLASSES': (
+        'rest_framework.renderers.JSONRenderer',
+    ),
     'DEFAULT_FILTER_BACKENDS': (
         'django_filters.rest_framework.DjangoFilterBackend',
     ),
@@ -145,6 +151,18 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',  # noqa: E501
     'PAGE_SIZE': 25,
 }
+# --- EMAIL ---
+EMAIL_ENABLE = env.bool('EMAIL_ENABLE', default=False)
+if EMAIL_ENABLE:
+    EMAIL_USE_TLS = env.bool('EMAIL_USE_TLS')
+    EMAIL_HOST = env('EMAIL_HOST')
+    EMAIL_HOST_USER = env('EMAIL_HOST_USER')
+    EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
+    EMAIL_PORT = env('EMAIL_PORT', default=587)
+else:
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL', default='no-reply@localhost')
 
 # --- CACHE ---
 CACHES = {
@@ -155,12 +173,22 @@ CACHES = {
 CACHALOT_ENABLED = env.bool('CACHALOT_ENABLED', default=False)
 CACHALOT_TIMEOUT = env('CACHALOT_TIMEOUT', default=60*20)
 
+# --- CELERY ---
+CELERY_BROKER_URL = env('CELERY_BROKER_URL', default='redis://redis:6379/2')
+CELERY_RESULT_BACKEND = env('CELERY_RESULT_BACKEND', default='redis://redis:6379/3')  # noqa: E501
+CELERY_DEFAULT_QUEUE = env('CELERY_DEFAULT_QUEUE', default='default')
+CELERY_BROKER_TRANSPORT_OPTIONS = {
+    'fanout_patterns': env('CELERY_FANOUT_PATTERNS', default=True),
+    'fanout_prefix': env('CELERY_FANOUT_PREFIX', default=True),
+    'visibility_timeout': env('CELERY_VISIBILITY_TIMEOUT', default=43200),
+}
+
 # --- SENTRY ---
 RAVEN_DSN = env('RAVEN_DSN', default=None)
 if RAVEN_DSN:
     RAVEN_CONFIG = {
         'dsn': env('RAVEN_DSN'),
-        'release': raven.fetch_git_sha((root - 2)()),
+        'CELERY_LOGLEVEL': logging.INFO,
     }
 
 # --- CORS ---
@@ -178,6 +206,10 @@ if DEBUG:
     REST_FRAMEWORK['DEFAULT_AUTHENTICATION_CLASSES'] = (
         *REST_FRAMEWORK['DEFAULT_AUTHENTICATION_CLASSES'],  # type: ignore
         'rest_framework.authentication.SessionAuthentication',
+    )
+    REST_FRAMEWORK['DEFAULT_RENDERER_CLASSES'] = (
+        *REST_FRAMEWORK['DEFAULT_RENDERER_CLASSES'],  # type: ignore
+        'rest_framework.renderers.BrowsableAPIRenderer',
     )
 
     DEBUG_TOOLBAR_CONFIG = {
