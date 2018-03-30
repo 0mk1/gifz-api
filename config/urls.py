@@ -11,6 +11,7 @@ app_urls_v1 = [
     url(r'', include('gifz_api.accounts.urls_v1')),
     url(r'', include('gifz_api.gifs.urls_v1')),
     url(r'auth/', include('djoser.urls')),
+    url(r'auth/', include('djoser.urls.authtoken')),
     # url(r'auth/', include('djoser.social.urls')),
 ]
 

@@ -1,3 +1,4 @@
+from django.db import transaction
 from rest_framework import viewsets
 
 from gifz_api.tasks import send_mail
@@ -16,8 +17,10 @@ class GIFEntryViewSet(viewsets.ModelViewSet):
     serializer_class = GIFEntrySerializer
     pagination_class = GIFEntryCursorPagination
 
+    @transaction.atomic
     def perform_create(self, serializer):
         super().perform_create(serializer)
+
         send_mail.delay(
             template_name='gif_creation_email.html',
             recipients_email_list=[
@@ -26,4 +29,4 @@ class GIFEntryViewSet(viewsets.ModelViewSet):
             context_dict={
                 'user': self.request.user.get_full_name(),
             },
-        )
+        ),

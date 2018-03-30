@@ -38,7 +38,7 @@ test:
 	$(RUN_DJANGO) test -vv
 
 create_admin:
-	$(RUN_MANAGE) createsuperuser --username admin --email admin@admin.com
+	$(RUN_MANAGE) createsuperuser --username admin
 
 redis-cli:
 	$(COMPOSE_CMD) run --rm redis redis-cli -h redis
