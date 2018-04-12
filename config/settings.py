@@ -133,6 +133,17 @@ STATIC_ROOT = env('STATIC_ROOT', default=(root - 1)('static'))
 MEDIA_URL = env('MEDIA_URL', default='/media/')
 MEDIA_ROOT = env('MEDIA_ROOT', default=(root - 1)('media'))
 
+AWS_STORAGE_BUCKET_NAME = env('AWS_STORAGE_BUCKET_NAME', default=None)
+if AWS_STORAGE_BUCKET_NAME is not None:
+    INSTALLED_APPS += ('storages',)
+    DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+    STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+    AWS_S3_CUSTOM_DOMAIN = env('AWS_S3_CUSTOM_DOMAIN')
+    AWS_ACCESS_KEY_ID = env('AWS_ACCESS_KEY_ID', default=None)
+    AWS_SECRET_ACCESS_KEY = env('AWS_SECRET_ACCESS_KEY', default=None)
+    AWS_S3_REGION_NAME = env('AWS_S3_REGION_NAME', default='us-east-1')
+    S3_USE_SIGV4 = True
+
 # --- REST FRAMEWORK ---
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
@@ -154,7 +165,7 @@ REST_FRAMEWORK = {
 # --- EMAIL ---
 EMAIL_ENABLE = env.bool('EMAIL_ENABLE', default=False)
 if EMAIL_ENABLE:
-    EMAIL_USE_TLS = env.bool('EMAIL_USE_TLS')
+    EMAIL_USE_TLS = env.bool('EMAIL_USE_TLS', default=True)
     EMAIL_HOST = env('EMAIL_HOST')
     EMAIL_HOST_USER = env('EMAIL_HOST_USER')
     EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')

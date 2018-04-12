@@ -10,7 +10,7 @@ services:
     image: redis:4.0.8-alpine
   django:
     build: .
-    image: gifz_api
+    image: gifz-api
     command: runserver
     volumes:
       - .:/project/code
@@ -23,7 +23,7 @@ services:
       - celery-worker
     env_file: .env
   celery-worker:
-    image: gifz_api
+    image: gifz-api
     command: celery
     volumes:
       - .:/project/code

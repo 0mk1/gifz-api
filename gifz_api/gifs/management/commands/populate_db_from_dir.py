@@ -19,6 +19,10 @@ class Command(BaseCommand):
         parser.add_argument('dir_path', nargs='+', type=str)
 
     def handle(self, *args, **options):
+        if GIFEntry.objects.count() > 1000:
+            self.stdout.write('You already have 1000 gifs in db.')
+            return
+
         dir_path = options['dir_path'][0]
 
         if os.path.exists(dir_path):

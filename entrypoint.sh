@@ -7,7 +7,9 @@ if [ "$1" = 'manage' ]; then
     shift
     exec $MANAGE_CMD $@
 elif [ "$1" = 'bootstrap' ]; then
-    exec $MANAGE_CMD migrate && $MANAGE_CMD collectstatic --no-input
+    $MANAGE_CMD migrate
+    $MANAGE_CMD collectstatic --no-input
+    exit 0
 elif [ "$1" = 'runserver' ]; then
     shift
     exec $MANAGE_CMD runserver_plus 0.0.0.0:8000 $@

@@ -13,6 +13,7 @@ def test_populate_db_from_dir(admin_user):
     GIFEntry.objects.all().delete()
 
 
+@pytest.mark.django_db
 def test_validation_of_dir_path():
     with pytest.raises(CommandError):
         call_command('populate_db_from_dir')

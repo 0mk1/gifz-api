@@ -20,6 +20,7 @@ bootstrap:
 	$(RUN_DJANGO) bootstrap
 
 load_test_data:
+	$(RUN_MANAGE) create_test_user a@a.com
 	$(RUN_MANAGE) populate_db_from_dir ./test_data/
 
 sh:
@@ -48,3 +49,6 @@ psql:
 
 logs:
 	$(COMPOSE_CMD) logs -f
+
+build-infra-production:
+	./bin/build-infra production
